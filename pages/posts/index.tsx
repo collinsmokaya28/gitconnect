@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppwrite } from 'your-appwrite-context'; // Adjust the import based on your context setup
+import Link from 'next/link'; // Import Link for navigation
 
 const PostsFeed = () => {
   const [posts, setPosts] = useState([]);
@@ -19,7 +20,6 @@ const PostsFeed = () => {
   }, [appwrite]);
 
   const handleLike = async (postId) => {
-    // Logic to increment likes
     const post = posts.find((p) => p.$id === postId);
     await appwrite.database.updateDocument('posts_collection_id', postId, {
       likes: post.likes + 1,
@@ -28,7 +28,6 @@ const PostsFeed = () => {
   };
 
   const handleDislike = async (postId) => {
-    // Logic to increment dislikes
     const post = posts.find((p) => p.$id === postId);
     await appwrite.database.updateDocument('posts_collection_id', postId, {
       dislikes: post.dislikes + 1,
@@ -37,7 +36,6 @@ const PostsFeed = () => {
   };
 
   const handleComment = async (postId, comment) => {
-    // Logic to add a comment
     const post = posts.find((p) => p.$id === postId);
     await appwrite.database.updateDocument('posts_collection_id', postId, {
       comments: [...post.comments, comment],
@@ -50,7 +48,9 @@ const PostsFeed = () => {
       <h1>Posts Feed</h1>
       {posts.map((post) => (
         <div key={post.$id} className="post">
-          <h2>{post.title}</h2>
+          <Link href={`/posts/${post.$id}`}>
+            <h2>{post.title}</h2>
+          </Link>
           <p>{post.content}</p>
           <p>Likes: {post.likes} Dislikes: {post.dislikes}</p>
           <button onClick={() => handleLike(post.$id)}>Like</button>
@@ -80,3 +80,4 @@ const PostsFeed = () => {
 };
 
 export default PostsFeed;
+

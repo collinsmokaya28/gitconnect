@@ -1,0 +1,82 @@
+import { useEffect, useState } from 'react';
+import { useAppwrite } from 'your-appwrite-context'; // Adjust the import based on your context setup
+
+const PostsFeed = () => {
+  const [posts, setPosts] = useState([]);
+  const appwrite = useAppwrite();
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await appwrite.database.listDocuments('posts_collection_id'); // Replace with your collection ID
+        setPosts(response.documents);
+      } catch (error) {
+        console.error('Failed to fetch posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, [appwrite]);
+
+  const handleLike = async (postId) => {
+    // Logic to increment likes
+    const post = posts.find((p) => p.$id === postId);
+    await appwrite.database.updateDocument('posts_collection_id', postId, {
+      likes: post.likes + 1,
+    });
+    setPosts(posts.map((p) => (p.$id === postId ? { ...p, likes: p.likes + 1 } : p)));
+  };
+
+  const handleDislike = async (postId) => {
+    // Logic to increment dislikes
+    const post = posts.find((p) => p.$id === postId);
+    await appwrite.database.updateDocument('posts_collection_id', postId, {
+      dislikes: post.dislikes + 1,
+    });
+    setPosts(posts.map((p) => (p.$id === postId ? { ...p, dislikes: p.dislikes + 1 } : p)));
+  };
+
+  const handleComment = async (postId, comment) => {
+    // Logic to add a comment
+    const post = posts.find((p) => p.$id === postId);
+    await appwrite.database.updateDocument('posts_collection_id', postId, {
+      comments: [...post.comments, comment],
+    });
+    setPosts(posts.map((p) => (p.$id === postId ? { ...p, comments: [...p.comments, comment] } : p)));
+  };
+
+  return (
+    <div>
+      <h1>Posts Feed</h1>
+      {posts.map((post) => (
+        <div key={post.$id} className="post">
+          <h2>{post.title}</h2>
+          <p>{post.content}</p>
+          <p>Likes: {post.likes} Dislikes: {post.dislikes}</p>
+          <button onClick={() => handleLike(post.$id)}>Like</button>
+          <button onClick={() => handleDislike(post.$id)}>Dislike</button>
+          <div>
+            <h3>Comments</h3>
+            <ul>
+              {post.comments.map((comment, index) => (
+                <li key={index}>{comment}</li>
+              ))}
+            </ul>
+            <input
+              type="text"
+              placeholder="Add a comment"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleComment(post.$id, e.target.value);
+                  e.target.value = ''; // Clear the input
+                }
+              }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default PostsFeed;

@@ -12,9 +12,13 @@ const SignIn = () => {
     e.preventDefault();
     try {
       await account.createSession(email, password);
-      router.push('/'); // Redirect to home or dashboard
+      router.push('/'); 
     } catch (err) {
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occured');
+      }
     }
   };
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { database } from '../../config/appwriteConfig'; // Your Appwrite config
-import axios from 'axios'; // Axios to fetch GitHub repositories
+import { database } from '../../config/appwriteConfig';
+import axios from 'axios'; 
 
 interface Developer {
   $id: string;
@@ -17,7 +17,7 @@ const DeveloperProfile = () => {
   const router = useRouter();
   const { id } = router.query; // Get developer id from URL
   const [developer, setDeveloper] = useState<Developer | null>(null);
-  const [repos, setRepos] = useState([]);
+  const [repos, setRepos] = useState<any[]>([]);
   const [error, setError] = useState('');
 
   // Fetch developer's personal details from Appwrite
@@ -28,7 +28,19 @@ const DeveloperProfile = () => {
         '66f3ff33003de50e7552', 
         id as string
       );
-      setDeveloper(response);
+
+      // Map the response to the Developer type
+      const developerData: Developer = {
+        $id: response.$id,
+        name: response.name,
+        email: response.email,
+        bio: response.bio,
+        github: response.github,
+        education: response.education,
+        experience: response.experience,
+      };
+
+      setDeveloper(developerData);
     } catch (err) {
       setError('Failed to fetch developer details.');
     }
@@ -86,7 +98,7 @@ const DeveloperProfile = () => {
         <h2 className="text-2xl font-semibold">GitHub Repositories</h2>
         {repos.length > 0 ? (
           <ul className="list-disc ml-6">
-            {repos.map((repo: any) => (
+            {repos.map((repo) => (
               <li key={repo.id}>
                 <a href={repo.html_url} target="_blank" rel="noopener noreferrer" className="text-blue-500">
                   {repo.name}
@@ -103,3 +115,4 @@ const DeveloperProfile = () => {
 };
 
 export default DeveloperProfile;
+

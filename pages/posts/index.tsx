@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAppwrite } from 'your-appwrite-context'; // Adjust the import based on your context setup
+import { useAppwrite } from '../../context/AppwriteContext'; 
 import Link from 'next/link'; // Import Link for navigation
 
 const PostsFeed = () => {
@@ -9,7 +9,7 @@ const PostsFeed = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await appwrite.database.listDocuments('posts_collection_id'); // Replace with your collection ID
+        const response = await appwrite.database.listDocuments('66f3ff33003de50e7552'); 
         setPosts(response.documents);
       } catch (error) {
         console.error('Failed to fetch posts:', error);
@@ -21,7 +21,7 @@ const PostsFeed = () => {
 
   const handleLike = async (postId) => {
     const post = posts.find((p) => p.$id === postId);
-    await appwrite.database.updateDocument('posts_collection_id', postId, {
+    await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
       likes: post.likes + 1,
     });
     setPosts(posts.map((p) => (p.$id === postId ? { ...p, likes: p.likes + 1 } : p)));
@@ -29,7 +29,7 @@ const PostsFeed = () => {
 
   const handleDislike = async (postId) => {
     const post = posts.find((p) => p.$id === postId);
-    await appwrite.database.updateDocument('posts_collection_id', postId, {
+    await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
       dislikes: post.dislikes + 1,
     });
     setPosts(posts.map((p) => (p.$id === postId ? { ...p, dislikes: p.dislikes + 1 } : p)));
@@ -37,7 +37,7 @@ const PostsFeed = () => {
 
   const handleComment = async (postId, comment) => {
     const post = posts.find((p) => p.$id === postId);
-    await appwrite.database.updateDocument('posts_collection_id', postId, {
+    await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
       comments: [...post.comments, comment],
     });
     setPosts(posts.map((p) => (p.$id === postId ? { ...p, comments: [...p.comments, comment] } : p)));

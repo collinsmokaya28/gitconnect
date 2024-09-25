@@ -1,6 +1,5 @@
-// pages/auth/signin.tsx
 import { useState } from 'react';
-import { account } from '../../config/appwriteConfig'; // Import the Appwrite account instance
+import { account } from '../../config/appwriteConfig'; 
 import { useRouter } from 'next/router';
 
 const SignIn = () => {
@@ -12,7 +11,7 @@ const SignIn = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await account.createEmailSession(email, password);
+      await account.createSession(email, password);
       router.push('/'); // Redirect to home or dashboard
     } catch (err) {
       setError(err.message);
@@ -49,3 +48,4 @@ const SignIn = () => {
 };
 
 export default SignIn;
+

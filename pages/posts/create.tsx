@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAppwrite } from 'your-appwrite-context'; // Adjust the import based on your context setup
+import { useAppwrite } from '../../context/AppwriteContext'; 
 import { useRouter } from 'next/router';
 
 const CreatePost = () => {
@@ -13,7 +13,7 @@ const CreatePost = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await appwrite.database.listDocuments('posts_collection_id'); // Replace with your collection ID
+        const response = await appwrite.database.listDocuments('66f3ff33003de50e7552'); 
         setPosts(response.documents);
       } catch (error) {
         console.error('Failed to fetch posts:', error);
@@ -26,7 +26,7 @@ const CreatePost = () => {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
-      await appwrite.database.createDocument('posts_collection_id', 'unique()', {
+      await appwrite.database.createDocument('66f3ff33003de50e7552', 'unique()', {
         title,
         content,
         authorId: 'your_user_id', // Replace with the current user's ID

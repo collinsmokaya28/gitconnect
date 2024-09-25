@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useAppwrite } from 'your-appwrite-context'; // Adjust the import based on your context setup
+import { useAppwrite } from '../../context/AppwriteContext';
 import { useRouter } from 'next/router';
 
 const EditProfile = () => {
   const [profileData, setProfileData] = useState({ name: '', email: '' }); // Add more fields as necessary
   const appwrite = useAppwrite();
   const router = useRouter();
-  const userId = 'your_user_id'; // Replace with the authenticated user's ID
+  const userId = '66f40b64000d7cd4eeac'; 
 
   useEffect(() => {
     // Fetch the current user's profile data

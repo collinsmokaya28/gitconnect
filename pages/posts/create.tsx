@@ -1,92 +1,68 @@
-import { useState, useEffect } from 'react';
-import { useAppwrite } from '../../context/AppwriteContext'; 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useAppwrite } from '../../context/AppwriteContext';
 
 const CreatePost = () => {
+  const router = useRouter();
+  const appwrite = useAppwrite();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [posts, setPosts] = useState([]); // State to hold existing posts
-  const appwrite = useAppwrite();
-  const router = useRouter();
+  const [error, setError] = useState('');
 
-  // Fetch existing posts
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await appwrite.database.listDocuments('66f3ff33003de50e7552'); 
-        setPosts(response.documents);
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
-      }
-    };
-
-    fetchPosts();
-  }, [appwrite]);
-
-  const handleCreatePost = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await appwrite.database.createDocument('66f3ff33003de50e7552', 'unique()', {
-        title,
-        content,
-        authorId: 'your_user_id', // Replace with the current user's ID
-        likes: 0,
-        dislikes: 0,
-        comments: [],
-      });
-      alert('Post created successfully!');
-      router.push('/posts'); // Redirect to the posts feed
-    } catch (error) {
-      console.error('Failed to create post:', error);
-      alert('Error creating post.');
-    }
-  };
 
-  const handleDeletePost = async (postId) => {
-    if (confirm('Are you sure you want to delete this post?')) {
-      try {
-        await appwrite.database.deleteDocument('posts_collection_id', postId);
-        alert('Post deleted successfully!');
-        setPosts(posts.filter(post => post.$id !== postId)); // Update state to remove the deleted post
-      } catch (error) {
-        console.error('Failed to delete post:', error);
-        alert('Error deleting post.');
-      }
+    // Check if appwrite is initialized
+    if (!appwrite || !appwrite.database) {
+      setError('Appwrite instance is not initialized.');
+      return;
+    }
+
+    try {
+      await appwrite.database.createDocument(
+        '66f3fec30023174c7911', // databaseId
+        '66f3ff33003de50e7552', // collectionId
+        'unique()', // documentId (use 'unique()' for auto-generated IDs)
+        {
+          title,
+          content,
+        }
+      );
+      router.push('/posts'); // Redirect after successful creation
+    } catch (err) {
+      console.error('Failed to create post:', err);
+      setError('Failed to create post. Please try again.');
     }
   };
 
   return (
-    <div>
-      <h1>Create a New Post</h1>
-      <form onSubmit={handleCreatePost}>
-        <label>
-          Title:
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Create Post</h1>
+      {error && <p className="text-red-500">{error}</p>}
+      <form onSubmit={handleSubmit} className="mb-4">
+        <div>
+          <label className="block mb-2">Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="border p-2 w-full"
           />
-        </label>
-        <label>
-          Content:
+        </div>
+        <div className="mt-4">
+          <label className="block mb-2">Content</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             required
+            className="border p-2 w-full"
           />
-        </label>
-        <button type="submit">Create Post</button>
-      </form>
-
-      <h2>Existing Posts</h2>
-      {posts.map((post) => (
-        <div key={post.$id}>
-          <h3>{post.title}</h3>
-          <p>{post.content}</p>
-          <button onClick={() => handleDeletePost(post.$id)}>Delete Post</button>
         </div>
-      ))}
+        <button type="submit" className="mt-4 bg-blue-500 text-white p-2 rounded">
+          Create Post
+        </button>
+      </form>
     </div>
   );
 };

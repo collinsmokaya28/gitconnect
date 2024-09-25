@@ -2,26 +2,41 @@ import { useState, useEffect } from 'react';
 import { useAppwrite } from '../../context/AppwriteContext';
 import { useRouter } from 'next/router';
 
+interface UserProfile {
+  name: string;
+  email: string;
+}
+
 const EditProfile = () => {
-  const [profileData, setProfileData] = useState({ name: '', email: '' }); // Add more fields as necessary
+  const [profileData, setProfileData] = useState<UserProfile>({ name: '', email: '' });
   const appwrite = useAppwrite();
   const router = useRouter();
-  const userId = '66f40b64000d7cd4eeac'; 
+  const userId = '66f40b64000d7cd4eeac'; // User ID
+  const databaseId = '66f3fec30023174c7911'; // Database ID
+  const collectionId = '66f3ff33003de50e7552'; // Collection ID
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      if (!appwrite?.database) return; 
+      if (!appwrite?.database) return;
 
       try {
-        const response = await appwrite.database.getDocument('profiles_collection_id', userId);
-        setProfileData(response);
+        // Correctly fetch the document with all required arguments
+        const response = await appwrite.database.getDocument(databaseId, collectionId, userId);
+        
+        // Map response to UserProfile type
+        const userProfile: UserProfile = {
+          name: response.name || '', // Ensure default values
+          email: response.email || '',
+        };
+
+        setProfileData(userProfile);
       } catch (error) {
         console.error('Failed to fetch profile data:', error);
       }
     };
 
     fetchProfileData();
-  }, [appwrite, userId]);
+  }, [appwrite, userId, collectionId, databaseId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,10 +46,16 @@ const EditProfile = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!appwrite?.database) return; // Check if appwrite is not null
+    if (!appwrite?.database) return;
 
     try {
-      await appwrite.database.updateDocument('profiles_collection_id', userId, profileData);
+      // Update document with databaseId, collectionId, userId, and profileData
+      await appwrite.database.updateDocument(
+        databaseId,  // Database ID
+        collectionId, // Collection ID
+        userId,      // Document ID
+        profileData  // Data to update
+      );
       alert('Profile updated successfully!');
       router.push('/profile'); // Redirect to the profile page
     } catch (error) {
@@ -47,11 +68,23 @@ const EditProfile = () => {
     <form onSubmit={handleSubmit}>
       <label>
         Name:
-        <input type="text" name="name" value={profileData.name} onChange={handleChange} required />
+        <input
+          type="text"
+          name="name"
+          value={profileData.name}
+          onChange={handleChange}
+          required
+        />
       </label>
       <label>
         Email:
-        <input type="email" name="email" value={profileData.email} onChange={handleChange} required />
+        <input
+          type="email"
+          name="email"
+          value={profileData.email}
+          onChange={handleChange}
+          required
+        />
       </label>
       {/* Add more fields as necessary */}
       <button type="submit">Update Profile</button>
@@ -60,3 +93,7 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
+
+
+
+

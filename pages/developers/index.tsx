@@ -20,8 +20,8 @@ const DevelopersList = () => {
   const fetchDevelopers = async () => {
     try {
       const response = await database.listDocuments(
-        'YOUR_DATABASE_ID', // Replace with your Appwrite database ID
-        'YOUR_COLLECTION_ID' // Replace with your Appwrite collection ID for developer profiles
+        '66f3fec30023174c7911', 
+        '66f3ff33003de50e7552' 
       );
       setDevelopers(response.documents);
       setLoading(false);

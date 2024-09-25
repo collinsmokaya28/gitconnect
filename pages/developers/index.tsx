@@ -1,4 +1,3 @@
-// pages/developers/index.tsx
 import { useEffect, useState } from 'react';
 import { database } from '../../config/appwriteConfig'; // Import Appwrite config
 import Link from 'next/link';
@@ -20,13 +19,23 @@ const DevelopersList = () => {
   const fetchDevelopers = async () => {
     try {
       const response = await database.listDocuments(
-        '66f3fec30023174c7911', 
-        '66f3ff33003de50e7552' 
+        '66f3fec30023174c7911',
+        '66f3ff33003de50e7552'
       );
-      setDevelopers(response.documents);
-      setLoading(false);
+
+      // Map response documents to Developer type
+      const developerData: Developer[] = response.documents.map(doc => ({
+        $id: doc.$id,
+        name: doc.name,
+        email: doc.email,
+        github: doc.github,
+        bio: doc.bio,
+      }));
+
+      setDevelopers(developerData);
     } catch (err) {
       setError('Failed to fetch developers.');
+    } finally {
       setLoading(false);
     }
   };
@@ -77,3 +86,4 @@ const DevelopersList = () => {
 };
 
 export default DevelopersList;
+

@@ -1,6 +1,7 @@
+"use client";
 import { useState } from 'react';
 import { account } from '../../config/appwriteConfig'; 
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');

@@ -1,7 +1,7 @@
-// pages/auth/signup.tsx
+"use client";
 import { useState } from 'react';
 import { account } from '../../config/appwriteConfig'; // Import the Appwrite account instance
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const SignUp = () => {
   const [name, setName] = useState('');

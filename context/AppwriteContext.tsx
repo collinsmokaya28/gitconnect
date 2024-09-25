@@ -1,12 +1,16 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Client, Account, Databases } from 'appwrite';
 
-const AppwriteContext = createContext(null);
+const AppwriteContext = createContext<{
+  client: Client | null;
+  account: Account | null;
+  database: Databases | null;
+} | null>(null);
 
-export const AppwriteProvider = ({ children }) => {
-  const [client, setClient] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [database, setDatabase] = useState(null);
+export const AppwriteProvider = ({ children }: {children: ReactNode}) => {
+  const [client, setClient] = useState<Client | null>(null);
+  const [account, setAccount] = useState<Account | null>(null);
+  const [database, setDatabase] = useState<Databases | null>(null);
 
   useEffect(() => {
     const initAppwrite = () => {

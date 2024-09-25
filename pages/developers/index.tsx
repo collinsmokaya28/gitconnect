@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { database } from '../../config/appwriteConfig'; // Import Appwrite config
-import Link from 'next/link';
+import { database } from '../../config/appwriteConfig'; 
+import DeveloperList from './components/DeveloperList';
 
 interface Developer {
   $id: string;
@@ -10,7 +10,7 @@ interface Developer {
   bio: string;
 }
 
-const DevelopersList = () => {
+const DevelopersPage = () => {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -19,8 +19,8 @@ const DevelopersList = () => {
   const fetchDevelopers = async () => {
     try {
       const response = await database.listDocuments(
-        '66f3fec30023174c7911',
-        '66f3ff33003de50e7552'
+        '66f3fec30023174c7911', 
+        '66f3ff33003de50e7552'  
       );
 
       // Map response documents to Developer type
@@ -58,32 +58,12 @@ const DevelopersList = () => {
       {developers.length === 0 ? (
         <p>No developers found.</p>
       ) : (
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {developers.map((developer) => (
-            <li key={developer.$id} className="p-4 border rounded-lg">
-              <h2 className="text-xl font-semibold">{developer.name}</h2>
-              <p>Email: {developer.email}</p>
-              <p>Bio: {developer.bio}</p>
-              <a
-                href={`https://github.com/${developer.github}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500"
-              >
-                GitHub Profile
-              </a>
-              <div className="mt-2">
-                <Link href={`/developers/${developer.$id}`}>
-                  <a className="text-blue-500">View Profile</a>
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <DeveloperList developers={developers} />
       )}
     </div>
   );
 };
 
-export default DevelopersList;
+export default DevelopersPage;
+
 

@@ -8,12 +8,15 @@ const PostsFeed = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      try {
-        const response = await appwrite.database.listDocuments('66f3ff33003de50e7552'); 
-        setPosts(response.documents);
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
+      if (appwrite?.database) {
+        try {
+          const response = await appwrite.database.listDocuments('66f3ff33003de50e7552');
+          setPosts(response.documents);
+        } catch (error) {
+          console.error('Failed to fetch posts', error);
+        }
       }
+
     };
 
     fetchPosts();
@@ -21,26 +24,32 @@ const PostsFeed = () => {
 
   const handleLike = async (postId) => {
     const post = posts.find((p) => p.$id === postId);
+    if (appwrite?.database && post) {
     await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
       likes: post.likes + 1,
     });
     setPosts(posts.map((p) => (p.$id === postId ? { ...p, likes: p.likes + 1 } : p)));
+    }
   };
 
   const handleDislike = async (postId) => {
     const post = posts.find((p) => p.$id === postId);
-    await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
+    if (appwrite?.database && post) {
+      await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
       dislikes: post.dislikes + 1,
-    });
+      });
     setPosts(posts.map((p) => (p.$id === postId ? { ...p, dislikes: p.dislikes + 1 } : p)));
+    }
   };
 
   const handleComment = async (postId, comment) => {
     const post = posts.find((p) => p.$id === postId);
-    await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
+    if (appwrite?.database && post) {
+      await appwrite.database.updateDocument('66f3ff33003de50e7552', postId, {
       comments: [...post.comments, comment],
-    });
+      });
     setPosts(posts.map((p) => (p.$id === postId ? { ...p, comments: [...p.comments, comment] } : p)));
+    }
   };
 
   return (

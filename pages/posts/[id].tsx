@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useAppwrite } from '../../context/AppwriteContext'; 
+import { useAppwrite } from '../../context/AppwriteContext';
 
 interface Post {
   $id: string;
@@ -11,33 +11,42 @@ interface Post {
 
 const PostDetail = () => {
   const router = useRouter();
-  const { id } = router.query; 
+  const { id } = router.query;
   const [post, setPost] = useState<Post | null>(null);
   const [comment, setComment] = useState('');
   const appwrite = useAppwrite();
 
   useEffect(() => {
-    if (id) {
-      const fetchPost = async () => {
-        if (!appwrite || !appwrite.database) {
-          console.error('Appwrite instance or database is not initialized');
-          return;
-        }
+    const fetchPost = async () => {
+      if (!id) return; // Ensure id is available
 
-        try {
-          const response = await appwrite.database.getDocument(
-            '66f3fec30023174c7911', // databaseID
-            '66f3ff33003de50e7552', // collectionID
-            id as string             // documentId
-          ); 
-          setPost(response);
-        } catch (error) {
-          console.error('Failed to fetch post:', error);
-        }
-      };
+      if (!appwrite || !appwrite.database) {
+        console.error('Appwrite instance or database is not initialized');
+        return;
+      }
 
-      fetchPost();
-    }
+      try {
+        const response = await appwrite.database.getDocument(
+          '66f3fec30023174c7911', // databaseID
+          '66f3ff33003de50e7552', // collectionID
+          id as string             // documentId
+        );
+
+        // Transform the response to match Post interface
+        const postData: Post = {
+          $id: response.$id,
+          title: response.title || 'Untitled', // Provide default title if missing
+          content: response.content || 'No content', // Provide default content if missing
+          comments: response.comments || [],
+        };
+
+        setPost(postData);
+      } catch (error) {
+        console.error('Failed to fetch post:', error);
+      }
+    };
+
+    fetchPost();
   }, [id, appwrite]);
 
   const handleCommentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -51,7 +60,8 @@ const PostDetail = () => {
         '66f3ff33003de50e7552',   // collectionID
         id as string,             // documentId
         { comments: updatedComments } // data
-      ); 
+      );
+
       setPost({ ...post, comments: updatedComments });
       setComment(''); // Clear the comment input
     } catch (error) {
@@ -87,6 +97,7 @@ const PostDetail = () => {
 };
 
 export default PostDetail;
+
 
 
 

@@ -14,9 +14,13 @@ const SignUp = () => {
     e.preventDefault();
     try {
       await account.create('unique()', email, password, name);
-      router.push('/auth/signin'); // Redirect to sign-in page after successful sign-up
+      router.push('/auth/signin'); 
     } catch (err) {
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     }
   };
 

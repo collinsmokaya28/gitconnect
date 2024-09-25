@@ -24,8 +24,8 @@ const DeveloperProfile = () => {
   const fetchDeveloper = async () => {
     try {
       const response = await database.getDocument(
-        'YOUR_DATABASE_ID', // Replace with your Appwrite Database ID
-        'YOUR_COLLECTION_ID', // Replace with your Appwrite Collection ID
+        '66f3fec30023174c7911', 
+        '66f3ff33003de50e7552', 
         id as string
       );
       setDeveloper(response);

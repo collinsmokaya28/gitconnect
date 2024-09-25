@@ -9,8 +9,9 @@ const EditProfile = () => {
   const userId = '66f40b64000d7cd4eeac'; 
 
   useEffect(() => {
-    // Fetch the current user's profile data
     const fetchProfileData = async () => {
+      if (!appwrite?.database) return; 
+
       try {
         const response = await appwrite.database.getDocument('profiles_collection_id', userId);
         setProfileData(response);
@@ -22,12 +23,16 @@ const EditProfile = () => {
     fetchProfileData();
   }, [appwrite, userId]);
 
-  const handleChange = (e) => {
-    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfileData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!appwrite?.database) return; // Check if appwrite is not null
+
     try {
       await appwrite.database.updateDocument('profiles_collection_id', userId, profileData);
       alert('Profile updated successfully!');

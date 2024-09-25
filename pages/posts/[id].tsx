@@ -25,7 +25,11 @@ const PostDetail = () => {
         }
 
         try {
-          const response = await appwrite.database.getDocument('66f3ff33003de50e7552', id as string); 
+          const response = await appwrite.database.getDocument(
+            '66f3fec30023174c7911', // databaseID
+            '66f3ff33003de50e7552', // collectionID
+            id as string             // documentId
+          ); 
           setPost(response);
         } catch (error) {
           console.error('Failed to fetch post:', error);
@@ -38,13 +42,16 @@ const PostDetail = () => {
 
   const handleCommentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!comment || !appwrite || !appwrite.database) return;
+    if (!comment || !appwrite || !appwrite.database || !post) return;
 
     try {
-      const updatedComments = [...(post?.comments || []), comment];
-      await appwrite.database.updateDocument('66f3ff33003de50e7552', id as string, {
-        comments: updatedComments,
-      }, []); // Passing an empty array for permissions, update if needed
+      const updatedComments = [...(post.comments || []), comment];
+      await appwrite.database.updateDocument(
+        '66f3fec30023174c7911',   // databaseID
+        '66f3ff33003de50e7552',   // collectionID
+        id as string,             // documentId
+        { comments: updatedComments } // data
+      ); 
       setPost({ ...post, comments: updatedComments });
       setComment(''); // Clear the comment input
     } catch (error) {
@@ -80,4 +87,6 @@ const PostDetail = () => {
 };
 
 export default PostDetail;
+
+
 

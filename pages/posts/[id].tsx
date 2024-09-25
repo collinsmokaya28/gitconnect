@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useAppwrite } from 'your-appwrite-context'; // Adjust the import based on your context setup
+import { useAppwrite } from '../../context/AppwriteContext'; 
 
 const PostDetail = () => {
   const router = useRouter();
@@ -13,7 +13,7 @@ const PostDetail = () => {
     if (id) {
       const fetchPost = async () => {
         try {
-          const response = await appwrite.database.getDocument('posts_collection_id', id); // Replace with your collection ID
+          const response = await appwrite.database.getDocument('66f3ff33003de50e7552', id); 
           setPost(response);
         } catch (error) {
           console.error('Failed to fetch post:', error);
@@ -29,7 +29,7 @@ const PostDetail = () => {
     if (!comment) return;
 
     try {
-      await appwrite.database.updateDocument('posts_collection_id', id, {
+      await appwrite.database.updateDocument('66f3ff33003de50e7552', id, {
         comments: [...(post.comments || []), comment],
       });
       setPost({ ...post, comments: [...(post.comments || []), comment] });

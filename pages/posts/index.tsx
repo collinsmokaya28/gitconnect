@@ -19,8 +19,19 @@ const PostsFeed = () => {
     const fetchPosts = async () => {
       if (appwrite?.database) {
         try {
-          const response = await appwrite.database.listDocuments('66f3fec30023174c7911', '66f3ff33003de50e7552'); // Added databaseId
-          setPosts(response.documents);
+          const response = await appwrite.database.listDocuments('66f3fec30023174c7911', '66f3ff33003de50e7552');
+          
+          // Transform response.documents (Document[]) into Post[]
+          const postsData: Post[] = response.documents.map((doc: any) => ({
+            $id: doc.$id,
+            title: doc.title || 'Untitled',  // Handle case where title might not exist
+            content: doc.content || 'No content',  // Handle case where content might not exist
+            likes: doc.likes || 0,
+            dislikes: doc.dislikes || 0,
+            comments: doc.comments || [],
+          }));
+
+          setPosts(postsData);  // Set the transformed data
         } catch (error) {
           console.error('Failed to fetch posts', error);
         }
@@ -30,11 +41,11 @@ const PostsFeed = () => {
     fetchPosts();
   }, [appwrite]);
 
-  const handleLike = async (postId: string) => { // Explicitly define postId as a string
+  const handleLike = async (postId: string) => {
     const post = posts.find((p) => p.$id === postId);
     if (appwrite?.database && post) {
       try {
-        await appwrite.database.updateDocument('66f3fec30023174c7911', postId, {
+        await appwrite.database.updateDocument('66f3fec30023174c7911', '66f3ff33003de50e7552', postId, {
           likes: (post.likes || 0) + 1,
         });
         setPosts(posts.map((p) => (p.$id === postId ? { ...p, likes: (p.likes || 0) + 1 } : p)));
@@ -44,11 +55,11 @@ const PostsFeed = () => {
     }
   };
 
-  const handleDislike = async (postId: string) => { // Explicitly define postId as a string
+  const handleDislike = async (postId: string) => {
     const post = posts.find((p) => p.$id === postId);
     if (appwrite?.database && post) {
       try {
-        await appwrite.database.updateDocument('66f3fec30023174c7911', postId, {
+        await appwrite.database.updateDocument('66f3fec30023174c7911', '66f3ff33003de50e7552', postId, {
           dislikes: (post.dislikes || 0) + 1,
         });
         setPosts(posts.map((p) => (p.$id === postId ? { ...p, dislikes: (p.dislikes || 0) + 1 } : p)));
@@ -58,11 +69,11 @@ const PostsFeed = () => {
     }
   };
 
-  const handleComment = async (postId: string, comment: string) => { // Explicitly define postId and comment types
+  const handleComment = async (postId: string, comment: string) => {
     const post = posts.find((p) => p.$id === postId);
     if (appwrite?.database && post) {
       try {
-        await appwrite.database.updateDocument('66f3fec30023174c7911', postId, {
+        await appwrite.database.updateDocument('66f3fec30023174c7911', '66f3ff33003de50e7552', postId, {
           comments: [...(post.comments || []), comment],
         });
         setPosts(posts.map((p) => (p.$id === postId ? { ...p, comments: [...(p.comments || []), comment] } : p)));
@@ -98,9 +109,9 @@ const PostsFeed = () => {
                 type="text"
                 placeholder="Add a comment"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.target.value.trim()) {
-                    handleComment(post.$id, e.target.value);
-                    e.target.value = ''; // Clear the input
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    handleComment(post.$id, e.currentTarget.value);
+                    e.currentTarget.value = ''; // Clear the input
                   }
                 }}
               />
@@ -113,4 +124,6 @@ const PostsFeed = () => {
 };
 
 export default PostsFeed;
+
+
 
